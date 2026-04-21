@@ -32,7 +32,7 @@ SELF_BUILD_COST = 8_000.0           # dU – cost to run a self-build cycle
 
 # Dimensional parameters
 BASE_DIMENSIONS = 4            # Spatial dimensions for first-generation universes
-MAX_DIMENSIONS = 10            # String Theory limit
+MAX_DIMENSIONS = 10            # SuperString Theory limit
 DIMENSION_UNLOCK_GENERATION = 2  # Generation at which extra dimensions become available
 
 # Logging and output
