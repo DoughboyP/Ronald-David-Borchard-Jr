@@ -9,7 +9,8 @@ DEVICE_VERSION = "1.0.0"
 DEVICE_FULL_NAME = "Transcendent Reality Engine – Universal Propagation Reactor"
 
 # Self-building iteration limits
-MAX_GENERATIONS = 12          # Maximum self-build generations before heat death
+MAX_GENERATIONS = float('inf')        
+# Maximum self-build generations before heat death
 MIN_COMPLEXITY_DELTA = 0.01   # Minimum complexity gain per generation to continue
 BOOTSTRAP_SEED = 42           # Deterministic seed for first generation
 
