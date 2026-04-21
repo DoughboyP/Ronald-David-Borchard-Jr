@@ -28,7 +28,7 @@ def parse_args() -> argparse.Namespace:
         "--seed",
         type=int,
         default=None,
-        help="Integer seed for the random universe generator (default: 42).",
+        help="Integer seed for the random universe generator (default: 94).",
     )
     return parser.parse_args()
 
