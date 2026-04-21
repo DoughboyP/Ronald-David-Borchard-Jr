@@ -12,7 +12,7 @@ DEVICE_FULL_NAME = "Transcendent Reality Engine – Universal Propagation Reacto
 MAX_GENERATIONS = float('inf')        
 # Maximum self-build generations before heat death
 MIN_COMPLEXITY_DELTA = 0.01   # Minimum complexity gain per generation to continue
-BOOTSTRAP_SEED = 42           # Deterministic seed for first generation
+BOOTSTRAP_SEED = 94           # Deterministic seed for first generation
 
 # Universe generation parameters
 MAX_UNIVERSES_PER_GENERATION = 5
