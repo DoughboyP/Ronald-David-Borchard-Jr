@@ -1,0 +1,3 @@
+# Frequently Asked Questions (FAQ)
+
+Here are some frequently asked questions regarding the wedding venues...

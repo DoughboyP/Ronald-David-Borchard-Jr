@@ -1,0 +1,3 @@
+# Venue Details
+
+Comprehensive details about the available wedding venues...

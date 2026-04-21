@@ -1,0 +1,3 @@
+# Wedding Planning Checklist
+
+A comprehensive checklist to guide you through your wedding planning process...

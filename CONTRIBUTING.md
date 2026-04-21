@@ -1,0 +1,3 @@
+# Contribution Guidelines
+
+Thank you for your interest in contributing! Here are the guidelines to follow...
