@@ -6,9 +6,9 @@ Main entry point - Select and play any chapter
 import sys
 
 def main():
-    print("=" * 60)
+    print("=" * 80)
     print("RONALD DAVID BORCHARD JR - LIFE ADVENTURE GAME")
-    print("=" * 60)
+    print("=" * 80)
     print("\nWelcome! Select a chapter to experience:")
     print("\n1. Birth to Infancy (Ages 0-5)")
     print("2. Childhood (Ages 5-12)")
@@ -56,13 +56,13 @@ def main():
         main()
 
 def print_full_story():
-    print("=" * 60)
+    print("=" * 80)
     print("THE COMPLETE STORY OF RONALD DAVID BORCHARD JR")
-    print("=" * 60)
+    print("=" * 80)
     print("""\nFrom Birth to Present Day (2026)\n\nRonald David Borchard Jr was born into a world of infinite possibilities.
 His journey began as a helpless infant and evolved through distinct life chapters:\n\n🍼 INFANCY (0-5): Discovering the world, first bonds, first steps, first words\n👦 CHILDHOOD (5-12): School, friendships, interests, personality formation\n👨 ADOLESCENCE (12-18): Identity, romance, major decisions, growth\n👨‍💼 YOUNG ADULTHOOD (18-25): Independence, career, relationships, adult responsibilities\n👨‍💼 ADULTHOOD TO PRESENT (25+): Leadership, legacy, family, impact\n\nEach chapter contains meaningful choices that shape the narrative.
 Play through each chapter to experience Ronald's complete life story!\n    """)
-    print("=" * 60)
+    print("=" * 80)
     input("\nPress ENTER to return to menu...")
     main()
 
