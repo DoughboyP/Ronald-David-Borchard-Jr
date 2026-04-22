@@ -28,7 +28,7 @@ SIMULATED_G = 6.673e-11        # N·m²/kg²
 INITIAL_ENERGY_BUDGET = 1_000_000_000_000.0  # dU – starting energy for generation 0
 ENERGY_SCALING_FACTOR = 1.618        # Each generation multiplies budget by golden ratio
 UNIVERSE_CREATION_COST = 100_000.0    # dU – base cost to spawn one universe
-SELF_BUILD_COST = 8_000.0           # dU – cost to run a self-build cycle
+SELF_BUILD_COST = 80_000.0           # dU – cost to run a self-build cycle
 
 # Dimensional parameters
 BASE_DIMENSIONS = 3           # Spatial dimensions for first-generation universes
