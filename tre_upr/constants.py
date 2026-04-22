@@ -5,7 +5,7 @@ Fundamental physical and metaphysical constants governing the device's operation
 
 # Device identity
 DEVICE_NAME = "TRE-UPR"
-DEVICE_VERSION = "3.0.0"
+DEVICE_VERSION = "4.0.0"
 DEVICE_FULL_NAME = "Transcendent Reality Engine – Universal Propagation Reactor"
 
 # Self-building iteration limits
