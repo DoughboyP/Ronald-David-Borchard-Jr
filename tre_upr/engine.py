@@ -43,19 +43,19 @@ class GenerationReport:
 
     def summary(self) -> str:
         lines = [
-            f"\n{'─' * 60}",
+            f"\n{'─' * 80}",
             f"{LOG_PREFIX} Generation {self.generation} Report",
-            f"{'─' * 60}",
+            f"{'─' * 80}",
             f"  Universes spawned : {len(self.universes)}",
             f"  Still alive       : {self.alive_count}",
             f"  Sentient life     : {self.sentient_count}",
             f"  Energy spent      : {self.energy_spent:,.1f} dU",
             f"  Complexity score  : {self.complexity_score:.4f}",
-            f"{'─' * 60}",
+            f"{'─' * 80}",
         ]
         for u in self.universes:
             lines.append(f"  » {u.status_line()}")
-        lines.append(f"{'─' * 60}")
+        lines.append(f"{'─' * 80}")
         return "\n".join(lines)
 
 
