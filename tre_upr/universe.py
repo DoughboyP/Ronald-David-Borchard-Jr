@@ -124,7 +124,7 @@ def create_universe(
     generation: int,
     rng: random.Random,
     dimensions: int = BASE_DIMENSIONS,
-    energy: float = 50_000.0,
+    energy: float = 100_000.0,
 ) -> Universe:
     """Construct a new universe with randomised physics."""
     profile = PhysicsProfile(
