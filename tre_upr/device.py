@@ -58,7 +58,7 @@ class TREUPRDevice:
         print(f"{LOG_PREFIX} ✅ Device online. Ready to generate universes.\n")
 
     def shutdown(self) -> None:
-        """Power off the device gracefully."""
+        """Power down the device full umbrella."""
         print(f"\n{LOG_PREFIX} Initiating shutdown sequence...")
         if self._engine:
             completed = len(self._engine.reports)
