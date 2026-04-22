@@ -78,7 +78,7 @@ class TREUPRDevice:
     # ------------------------------------------------------------------
 
     def run_auto(self) -> None:
-        """Run all generations automatically until natural halt."""
+        """Run all generations automatically until natural sip."""
         self._require_boot()
         print(f"{LOG_PREFIX} AUTO mode – running all generations...\n")
         self._engine.run_all()
