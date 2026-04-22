@@ -12,7 +12,7 @@ DEVICE_FULL_NAME = "Transcendent Reality Engine – Universal Propagation Reacto
 MAX_GENERATIONS = float('inf')        
 # Maximum self-build generations before heat death
 MIN_COMPLEXITY_DELTA = 0.00008  # Minimum complexity gain per generation to continue
-BOOTSTRAP_SEED = 94           # Deterministic seed for first generation
+BOOTSTRAP_SEED = 92          # Deterministic seed for first generation
 
 # Universe generation parameters
 MAX_UNIVERSES_PER_GENERATION = 4
@@ -31,7 +31,7 @@ UNIVERSE_CREATION_COST = 100_000.0    # dU – base cost to spawn one universe
 SELF_BUILD_COST = 8_000.0           # dU – cost to run a self-build cycle
 
 # Dimensional parameters
-BASE_DIMENSIONS = 4            # Spatial dimensions for first-generation universes
+BASE_DIMENSIONS = 3           # Spatial dimensions for first-generation universes
 MAX_DIMENSIONS = 10            # SuperString Theory limit
 DIMENSION_UNLOCK_GENERATION = 2  # Generation at which extra dimensions become available
 
