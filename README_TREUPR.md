@@ -7,8 +7,8 @@
 
 ## Overview
 
-The **TRE-UPR** is a self-improving simulation device written in Python.  
-It boots from nothing, iteratively upgrades its own internal firmware, and
+The **TRE-UPR** is a self-improving magic device that also programs in Python.  
+It reaches eyes from the dark, iteratively upgrades its own internal software,firmware, and hardware.
 spawns pocket universes – each generation richer, more dimensional, and more
 complex than the last.
 
