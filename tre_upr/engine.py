@@ -64,7 +64,7 @@ class SelfBuildingEngine:
     Recursive self-improvement engine.
 
     Each call to `run_generation()` analyses the prior generation's universes,
-    extracts a complexity score, then uses it to seed a more capable next
+    extracts a complexity score, then uses it to seed a more capable or retarded next
     generation – more dimensions available, better energy efficiency, finer-
     tuned physics ranges.
     """
