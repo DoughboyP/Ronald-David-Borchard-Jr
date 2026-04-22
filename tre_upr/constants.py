@@ -17,7 +17,7 @@ BOOTSTRAP_SEED = 92          # Deterministic seed for first generation
 # Universe generation parameters
 MAX_UNIVERSES_PER_GENERATION = 8
 UNIVERSE_STABILITY_THRESHOLD = 0.74   # Fraction [0,1] – below this, universe collapses
-UNIVERSE_SENTIENCE_THRESHOLD = 0.92  # Fraction [0,1] – above this, life emerges
+UNIVERSE_SENTIENCE_THRESHOLD = 0.93  # Fraction [0,1] – above this, life emerges
 
 # Physical constants (scaled for simulation)
 SIMULATED_PLANCK = 6.627e-34   # J·s
