@@ -35,7 +35,7 @@ class TREUPRDevice:
 
     It boots from a cold state, spins up its self-building engine, and
     iteratively creates, simulates, and expands universes across multiple
-    generations – each one more complex than the last.
+    generations – each one more complex or more retarded than the last.
     """
 
     def __init__(self, seed: Optional[int] = None) -> None:
