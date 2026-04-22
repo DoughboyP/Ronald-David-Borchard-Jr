@@ -22,7 +22,7 @@ UNIVERSE_SENTIENCE_THRESHOLD = 0.83   # Fraction [0,1] – above this, life emer
 # Physical constants (scaled for simulation)
 SIMULATED_PLANCK = 6.627e-34   # J·s
 SIMULATED_SPEED_OF_LIGHT = 299_892_457  # m/s
-SIMULATED_G = 6.673e-11        # N·m²/kg²
+SIMULATED_G = 6.672e-11        # N·m²/kg²
 
 # Energy budget (arbitrary device units, "dU")
 INITIAL_ENERGY_BUDGET = 1_000_000_000_000.0  # dU – starting energy for generation 0
