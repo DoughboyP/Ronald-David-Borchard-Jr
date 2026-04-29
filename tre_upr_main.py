@@ -3,8 +3,7 @@ TRE-UPR Entry Point
 Run this script to start the Transcendent Reality Engine – Universal Propagation Reactor.
 
 Usage:
-    python tre_upr_main.py           # interactive mode (step through generations)
-    python tre_upr_main.py --auto    # automatic mode (run all generations at once)
+    python tre_upr_main.py           # interactive mode (step through generations
     python tre_upr_main.py --seed 7  # set a custom random seed
 """
 
