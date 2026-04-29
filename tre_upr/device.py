@@ -25,7 +25,7 @@ _BANNER = r"""
   |_| |_| \_|_____|      \___/|_|   |_| \_\
 
   Transcendent Reality Engine – Universal Propagation Reactor
-  Version {version}  ·  All realities simulated within are fictional.
+  Version {version}  ·  All realities simulated within are real.
 """
 
 
