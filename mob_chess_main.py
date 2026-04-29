@@ -7,7 +7,7 @@ Collect bodies, wear them, and run the whole universe on mob pimp shit.
 
 Usage:
     python mob_chess_main.py
-    python mob_chess_main.py --seed 42
+    python mob_chess_main.py --seed 92
 """
 
 import argparse
