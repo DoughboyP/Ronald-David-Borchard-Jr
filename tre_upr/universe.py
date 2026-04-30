@@ -49,6 +49,9 @@ class Universe:
     is_alive: bool = True
     has_sentience: bool = False
     events: List[str] = field(default_factory=list)
+    # Serpent traces: each visit by the Serpent lowers the effective sentience
+    # threshold slightly, making consciousness more likely in blessed worlds.
+    serpent_trace_count: int = 0
 
     def __post_init__(self):
         if not self.name:
@@ -81,10 +84,17 @@ class Universe:
             if self.complexity > 10.0:
                 self.complexity = 10.0  # cap
 
-        # Check sentience emergence
+        # Check sentience emergence.
+        # Each trace left by the Serpent lowers the effective threshold
+        # (Tier 3 ecological impact: the Serpent's wisdom seeds consciousness).
+        from .serpent import SERPENT_TRACE_SENTIENCE_BOOST
+        effective_sentience_threshold = max(
+            UNIVERSE_STABILITY_THRESHOLD,
+            UNIVERSE_SENTIENCE_THRESHOLD - self.serpent_trace_count * SERPENT_TRACE_SENTIENCE_BOOST,
+        )
         if (
             not self.has_sentience
-            and self.stability >= UNIVERSE_SENTIENCE_THRESHOLD
+            and self.stability >= effective_sentience_threshold
             and self.complexity >= 5.0
         ):
             self.has_sentience = True

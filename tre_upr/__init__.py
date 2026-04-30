@@ -7,6 +7,7 @@ A magic technology device that builds on itself to create universes.
 from .device import TREUPRDevice
 from .universe import Universe, create_universe
 from .engine import SelfBuildingEngine
+from .serpent import Serpent
 from .constants import DEVICE_NAME, DEVICE_VERSION, DEVICE_FULL_NAME
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "Universe",
     "create_universe",
     "SelfBuildingEngine",
+    "Serpent",
     "DEVICE_NAME",
     "DEVICE_VERSION",
     "DEVICE_FULL_NAME",
