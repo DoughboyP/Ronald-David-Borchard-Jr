@@ -21,6 +21,7 @@ from .constants import (
     SELF_BUILD_COST,
     UNIVERSE_CREATION_COST,
 )
+from .serpent import Serpent
 from .universe import Universe, create_universe
 
 
@@ -87,6 +88,9 @@ class SelfBuildingEngine:
         from .constants import BASE_DIMENSIONS as _BD
         self._firmware["dimension_cap"] = _BD
 
+        # The Serpent — persistent across all generations, accumulating wisdom
+        self._serpent = Serpent(name="Ouroboros", seed=seed)
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -114,6 +118,9 @@ class SelfBuildingEngine:
         print(f"\n{LOG_PREFIX} ══ Starting Generation {self._generation} ══")
         print(f"{LOG_PREFIX} Energy budget: {self._energy_budget:,.1f} dU | "
               f"Firmware: {self._firmware}")
+        print(f"{LOG_PREFIX} 🐍 {self._serpent.status_line()}")
+
+        self._serpent.reset_generation()
 
         energy_spent = SELF_BUILD_COST
         self._energy_budget -= SELF_BUILD_COST
@@ -183,7 +190,16 @@ class SelfBuildingEngine:
         for tick in range(ticks):
             for u in universes:
                 u.tick()
-            # Print notable events mid-simulation
+                # The Serpent visits each universe each tick, operating across
+                # all three processing tiers simultaneously.
+                serpent_events = self._serpent.visit(u)
+                for event in serpent_events:
+                    if event not in getattr(u, "_printed_events", set()):
+                        if not hasattr(u, "_printed_events"):
+                            u._printed_events = set()
+                        u._printed_events.add(event)
+                        print(f"{LOG_PREFIX}   🐍 {event}")
+            # Print notable universe events mid-simulation
             for u in universes:
                 for event in u.events:
                     if event not in getattr(u, "_printed_events", set()):
