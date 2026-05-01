@@ -178,7 +178,7 @@ class World:
         """Spawn a new randomised world."""
         env = Environment.random(rng)
         res = Resources.random(rng)
-        radius = rng.uniform(MIN_WORLD_RADIUS_KM, MAX_WORLD_RADIUS_KM)
+        radius = rng.uniform(MIN_WORLD_RADIUS, MAX_WORLD_RADIUS)
 
         entities: List[Entity] = []
         for uid in range(INITIAL_ENTITY_COUNT):
