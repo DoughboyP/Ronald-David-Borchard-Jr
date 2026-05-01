@@ -17,8 +17,8 @@ LOG_PREFIX = "[EL-CAP]"
 # Simulation defaults
 # ──────────────────────────────────────────────
 DEFAULT_NUM_WORLDS = 4
-DEFAULT_SIMULATION_TICKS = 100
-DEFAULT_SEED = 2025
+DEFAULT_SIMULATION_TICKS = 1000
+DEFAULT_SEED = 1992
 
 # ──────────────────────────────────────────────
 # World parameters
