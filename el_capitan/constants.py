@@ -29,8 +29,8 @@ WORLD_NAME_POOL = [
     "Jadestone", "Kairos", "Luminos", "Meridian", "Novaterra",
 ]
 
-MIN_WORLD_RADIUS_KM = 5_000
-MAX_WORLD_RADIUS_KM = 8_000
+MIN_WORLD_RADIUS = 5_000
+MAX_WORLD_RADIUS = 8_000
 
 # ──────────────────────────────────────────────
 # Environment (Tier 1) parameters
