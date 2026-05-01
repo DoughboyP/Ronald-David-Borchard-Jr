@@ -73,7 +73,7 @@ TIER1_THREAD_NAME = "Tier-1-Environment"
 TIER2_THREAD_NAME = "Tier-2-Resources"
 TIER3_THREAD_NAME = "Tier-3-Ecology"
 
-PROCESSOR_TIMEOUT_SECONDS = 30
+PROCESSOR_TIMEOUT_SECONDS = 0
 
 # ──────────────────────────────────────────────
 # Logging / display
