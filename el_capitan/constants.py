@@ -24,7 +24,7 @@ DEFAULT_SEED = 1992
 # World parameters
 # ──────────────────────────────────────────────
 WORLD_NAME_POOL = [
-    "Aetheria", "Borchard Prime", "Cascadia", "Dawnworld",
+    "Aetheria", "Borchard Prime", "Cascadia", "Dawnworld", "Ronnie's hells", "Hollywood",
     "Elysium", "Feronia", "Gaia-2", "Horizon", "Ironreach",
     "Jadestone", "Kairos", "Luminos", "Meridian", "Novaterra",
 ]
