@@ -3,8 +3,8 @@ TRE-UPR Entry Point
 Run this script to start the Transcendent Reality Engine – Universal Propagation Reactor.
 
 Usage:
-    python tre_upr_main.py           # interactive mode (step through generations
-    python tre_upr_main.py --seed 7  # set a custom random seed
+    python3 tre_upr_main.py           # interactive mode (step through generations
+    python3 tre_upr_main.py --seed 7  # set a custom random seed
 """
 
 import argparse
@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
         "--seed",
         type=int,
         default=None,
-        help="Integer seed for the random universe generator (default: 92).",
+        help="Integer seed for the random universe generator (default: 1992).",
     )
     return parser.parse_args()
 
