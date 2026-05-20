@@ -6,8 +6,8 @@ the board. You are a Demigod rising in the cracks between their moves.
 Collect bodies, wear them, and run the whole universe on mob pimp shit.
 
 Usage:
-    python mob_chess_main.py
-    python mob_chess_main.py --seed 92
+    python3 mob_chess_main.py
+    python3 mob_chess_main.py --seed 92
 """
 
 import argparse
