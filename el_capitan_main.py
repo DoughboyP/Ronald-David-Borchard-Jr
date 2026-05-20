@@ -4,10 +4,10 @@ Run this script to launch the El Capitan world-simulation engine.
 
 Usage
 -----
-    python el_capitan_main.py                          # interactive mode
-    python el_capitan_main.py --auto                   # run all ticks automatically
-    python el_capitan_main.py --auto --worlds 5 --ticks 100
-    python el_capitan_main.py --auto --seed 42 --log-level DEBUG
+    python3 el_capitan_main.py                          # interactive mode
+    python3 el_capitan_main.py --auto                   # run all ticks automatically
+    python3 el_capitan_main.py --auto --worlds 5 --ticks 100
+    python3 el_capitan_main.py --auto --seed 42 --log-level DEBUG
 """
 
 import argparse
