@@ -16,7 +16,6 @@ from typing import Dict, List, Optional
 from .constants import (
     LOG_PREFIX,
     POPULATION_GROWTH_RATE,
-    WORLD_NAME_POOL,
     WORLD_STABILITY_DECAY,
     WORLD_TYPES,
 )
@@ -28,15 +27,14 @@ class WorldForge:
     Unlimited world-creation engine.
 
     The controller can call ``forge()`` as many times as desired.
-    Each call mints a new ``LineshineWorld`` with a unique uid,
-    optionally driven by user-supplied parameters.
+    Each call mints a new ``LineshineWorld`` identified only by its
+    auto-incrementing numeric uid.
     """
 
     def __init__(self, rng: random.Random) -> None:
         self._rng = rng
         self._counter = 0
         self._worlds: Dict[int, LineshineWorld] = {}
-        self._used_names: set = set()
 
     # ------------------------------------------------------------------
     # Core creation
@@ -44,7 +42,6 @@ class WorldForge:
 
     def forge(
         self,
-        name: Optional[str] = None,
         world_type: Optional[str] = None,
         creator_note: str = "",
     ) -> LineshineWorld:
@@ -53,10 +50,6 @@ class WorldForge:
 
         Parameters
         ----------
-        name:
-            Custom name for the world.  If omitted a unique name is
-            drawn from the built-in pool (or auto-generated if the pool
-            is exhausted).
         world_type:
             One of the ``WORLD_TYPES``.  If omitted, chosen at random.
         creator_note:
@@ -70,7 +63,6 @@ class WorldForge:
         self._counter += 1
         uid = self._counter
 
-        resolved_name = self._resolve_name(name)
         if world_type and world_type not in WORLD_TYPES:
             raise ValueError(
                 f"Unknown world type '{world_type}'. "
@@ -79,14 +71,13 @@ class WorldForge:
 
         world = LineshineWorld.forge(
             uid=uid,
-            name=resolved_name,
             rng=self._rng,
             world_type=world_type,
             creator_note=creator_note,
         )
         self._worlds[uid] = world
         print(
-            f"{LOG_PREFIX} ✦ World #{uid} '{resolved_name}' forged "
+            f"{LOG_PREFIX} ✦ World {uid} forged "
             f"({world.world_type}, radius={world.radius_km:,.0f} km, "
             f"pop={world.population:,})"
         )
@@ -112,29 +103,27 @@ class WorldForge:
             if world.stability <= 0.0:
                 world.is_active = False
                 world.log("World collapsed — stability reached zero.")
-                print(f"{LOG_PREFIX} ⚠ World '{world.name}' has collapsed.")
+                print(f"{LOG_PREFIX} ⚠ World {world.uid} has collapsed.")
 
     def deactivate(self, uid: int) -> None:
         """Put a world into dormant (inactive) state."""
         world = self._get(uid)
         world.is_active = False
         world.log("World deactivated by controller.")
-        print(f"{LOG_PREFIX} 💤 World '{world.name}' deactivated.")
+        print(f"{LOG_PREFIX} 💤 World {world.uid} deactivated.")
 
     def reactivate(self, uid: int) -> None:
         """Restore a dormant world to active state."""
         world = self._get(uid)
         world.is_active = True
         world.log("World reactivated by controller.")
-        print(f"{LOG_PREFIX} ✅ World '{world.name}' reactivated.")
+        print(f"{LOG_PREFIX} ✅ World {world.uid} reactivated.")
 
     def destroy(self, uid: int) -> None:
         """Permanently remove a world from the forge."""
         world = self._get(uid)
-        name = world.name
         del self._worlds[uid]
-        self._used_names.discard(name)
-        print(f"{LOG_PREFIX} 💥 World '{name}' (uid={uid}) destroyed.")
+        print(f"{LOG_PREFIX} 💥 World {uid} destroyed.")
 
     # ------------------------------------------------------------------
     # Queries
@@ -160,23 +149,6 @@ class WorldForge:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-
-    def _resolve_name(self, name: Optional[str]) -> str:
-        if name:
-            if name in self._used_names:
-                # Append uid to make it unique
-                name = f"{name}-{self._counter}"
-            self._used_names.add(name)
-            return name
-
-        # Draw from pool, fall back to generated name
-        available = [n for n in WORLD_NAME_POOL if n not in self._used_names]
-        if available:
-            chosen = self._rng.choice(available)
-        else:
-            chosen = f"World-{self._counter}"
-        self._used_names.add(chosen)
-        return chosen
 
     def _get(self, uid: int) -> LineshineWorld:
         if uid not in self._worlds:
