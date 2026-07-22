@@ -10,6 +10,7 @@ a new world to the ever-growing multiverse.
 
 from __future__ import annotations
 
+import json
 import random
 from typing import Dict, List, Optional
 
@@ -43,6 +44,7 @@ class WorldForge:
     def forge(
         self,
         world_type: Optional[str] = None,
+        name: str = "",
         creator_note: str = "",
     ) -> LineshineWorld:
         """
@@ -52,6 +54,8 @@ class WorldForge:
         ----------
         world_type:
             One of the ``WORLD_TYPES``.  If omitted, chosen at random.
+        name:
+            Optional display name for the world chosen by the controller.
         creator_note:
             Optional personal annotation from the controller.
 
@@ -73,11 +77,13 @@ class WorldForge:
             uid=uid,
             rng=self._rng,
             world_type=world_type,
+            name=name,
             creator_note=creator_note,
         )
         self._worlds[uid] = world
+        name_part = f" \"{world.name}\"" if world.name else ""
         print(
-            f"{LOG_PREFIX} ✦ World {uid} forged "
+            f"{LOG_PREFIX} ✦ World {uid}{name_part} forged "
             f"({world.world_type}, radius={world.radius_km:,.0f} km, "
             f"pop={world.population:,})"
         )
