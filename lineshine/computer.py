@@ -44,15 +44,15 @@ _BANNER = r"""
 
 _HELP = """
   ── Commands ──────────────────────────────────────────────────
-  create  [name] [type]   Forge a new world (name and type optional)
+  create  [type]          Forge a new world (type optional)
   list                    List all worlds
-  info    <uid>           Show detailed info for a world
-  scan    <uid>           Have Ra's Eye observe a specific world
+  info    <num>           Show detailed info for a world
+  scan    <num>           Have Ra's Eye observe a specific world
   scan-all                Have Ra's Eye observe every active world
-  tick                    Advance all worlds by one simulation tick
-  deactivate <uid>        Put a world into dormant state
-  reactivate <uid>        Restore a dormant world
-  destroy <uid>           Permanently destroy a world
+  tick    [n]             Advance all worlds by n ticks (default 1)
+  deactivate <num>        Put a world into dormant state
+  reactivate <num>        Restore a dormant world
+  destroy <num>           Permanently destroy a world
   eye                     Show Ra's Eye status
   types                   List available world types
   help                    Show this help message
@@ -116,13 +116,13 @@ class LineshineComputer:
         print(f"{'═' * LINE_WIDTH}")
 
         if worlds:
-            print(f"\n  {'UID':>4}  {'Name':<20}  {'Type':<12}  {'Age':>5}  {'Pop':>9}  {'Stab'}")
-            print(f"  {'─'*4}  {'─'*20}  {'─'*12}  {'─'*5}  {'─'*9}  {'─'*4}")
+            print(f"\n  {'Num':>4}  {'Type':<12}  {'Pop':>9}  {'Stab'}")
+            print(f"  {'─'*4}  {'─'*12}  {'─'*9}  {'─'*4}")
             for w in worlds:
                 active = "✅" if w.is_active else "💤"
                 print(
-                    f"  {w.uid:>4}  {w.name:<20}  {w.world_type:<12}  "
-                    f"{w.age_ticks:>5}t  {w.population:>9,}  {w.stability:.2f}  {active}"
+                    f"  {w.uid:>4}  {w.world_type:<12}  "
+                    f"{w.population:>9,}  {w.stability:.2f}  {active}"
                 )
         else:
             print("\n  No worlds were forged during this session.")
@@ -139,13 +139,12 @@ class LineshineComputer:
 
     def forge(
         self,
-        name: Optional[str] = None,
         world_type: Optional[str] = None,
         creator_note: str = "",
     ) -> LineshineWorld:
         """Forge a new world and immediately observe it with Ra's Eye."""
         self._require_boot()
-        world = self._forge.forge(name=name, world_type=world_type, creator_note=creator_note)
+        world = self._forge.forge(world_type=world_type, creator_note=creator_note)
         vision = self._eye.observe(world)
         print(vision.display())
         print()
@@ -226,9 +225,8 @@ class LineshineComputer:
             print()
 
         elif cmd == "create":
-            name = args[0] if len(args) >= 1 else None
-            wtype = args[1] if len(args) >= 2 else None
-            self.forge(name=name, world_type=wtype)
+            wtype = args[0] if args else None
+            self.forge(world_type=wtype)
 
         elif cmd == "list":
             worlds = self._forge.all_worlds()
@@ -275,7 +273,7 @@ class LineshineComputer:
         elif cmd == "destroy":
             uid = self._parse_uid(args)
             confirm = input(
-                f"  Are you sure you want to destroy world uid={uid}? (yes/no): "
+                f"  Are you sure you want to destroy World {uid}? (yes/no): "
             ).strip().lower()
             if confirm == "yes":
                 self._forge.destroy(uid)

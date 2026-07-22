@@ -10,7 +10,6 @@ from dataclasses import dataclass, field
 from typing import List, Optional
 
 from .constants import (
-    AGE_STAGES,
     MAX_WORLD_RADIUS_KM,
     MIN_WORLD_RADIUS_KM,
     WORLD_TYPES,
@@ -28,7 +27,7 @@ class RasEyeVision:
     a structured vision that the controller can inspect.
     """
 
-    world_name: str
+    world_number: int
     tick: int
     power_level: str
     insight: str
@@ -39,7 +38,7 @@ class RasEyeVision:
 
     def display(self) -> str:
         lines = [
-            f"  👁  Ra's Eye Vision — {self.world_name}",
+            f"  👁  Ra's Eye Vision — World {self.world_number}",
             f"     Power level   : {self.power_level}",
             f"     Tick observed : {self.tick}",
             f"     Population    : {self.population_observed:,}",
@@ -56,13 +55,12 @@ class LineshineWorld:
     """
     A world forged inside the Lineshine computer by the controller.
 
-    Each world is uniquely identified by its ``uid`` and ``name``.
+    Each world is uniquely identified by its numeric ``uid``.
     Worlds evolve over simulation ticks: population grows, stability
     drifts, and Ra's Eye records visions at key moments.
     """
 
     uid: int
-    name: str
     world_type: str
     radius_km: float
     population: int
@@ -77,7 +75,6 @@ class LineshineWorld:
     def forge(
         cls,
         uid: int,
-        name: str,
         rng: random.Random,
         world_type: Optional[str] = None,
         creator_note: str = "",
@@ -89,31 +86,18 @@ class LineshineWorld:
         stability = rng.uniform(0.6, 1.0)
         w = cls(
             uid=uid,
-            name=name,
             world_type=wtype,
             radius_km=radius,
             population=pop,
             stability=stability,
             creator_note=creator_note,
         )
-        w.log(f"World '{name}' forged by the controller.")
+        w.log(f"World {uid} forged by the controller.")
         return w
 
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
-
-    @property
-    def age_stage(self) -> str:
-        if self.age_ticks < 5:
-            return AGE_STAGES[0]
-        if self.age_ticks < 20:
-            return AGE_STAGES[1]
-        if self.age_ticks < 60:
-            return AGE_STAGES[2]
-        if self.age_ticks < 120:
-            return AGE_STAGES[3]
-        return AGE_STAGES[4]
 
     def log(self, msg: str) -> None:
         self.event_log.append(f"[t={self.age_ticks}] {msg}")
@@ -121,19 +105,17 @@ class LineshineWorld:
     def status_line(self) -> str:
         active = "✅" if self.is_active else "💤"
         return (
-            f"{active} [{self.uid:>4}] {self.name:<20} | "
+            f"{active} World {self.uid:>4} | "
             f"Type={self.world_type:<12} | "
-            f"Age={self.age_ticks:>4}t ({self.age_stage:<10}) | "
             f"Pop={self.population:>8,} | "
             f"Stability={self.stability:.2f}"
         )
 
     def detail(self) -> str:
         lines = [
-            f"  World : {self.name}  (uid={self.uid})",
+            f"  World : {self.uid}",
             f"  Type  : {self.world_type}",
             f"  Radius: {self.radius_km:,.0f} km",
-            f"  Age   : {self.age_ticks} ticks ({self.age_stage})",
             f"  Pop   : {self.population:,}",
             f"  Stab  : {self.stability:.2f}",
             f"  Active: {'Yes' if self.is_active else 'No'}",

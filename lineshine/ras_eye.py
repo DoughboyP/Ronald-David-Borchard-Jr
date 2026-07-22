@@ -81,7 +81,7 @@ class RasEye:
         anomaly, anomaly_desc = self._detect_anomaly(world)
 
         vision = RasEyeVision(
-            world_name=world.name,
+            world_number=world.uid,
             tick=self._tick,
             power_level=self._current_power_level,
             insight=insight,
