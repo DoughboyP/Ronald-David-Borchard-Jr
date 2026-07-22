@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from .constants import (
     MAX_WORLD_RADIUS_KM,
@@ -66,6 +66,7 @@ class LineshineWorld:
     population: int
     stability: float            # 0.0–1.0
     age_ticks: int = 0
+    name: str = ""
     creator_note: str = ""
     visions: List[RasEyeVision] = field(default_factory=list)
     event_log: List[str] = field(default_factory=list)
@@ -77,6 +78,7 @@ class LineshineWorld:
         uid: int,
         rng: random.Random,
         world_type: Optional[str] = None,
+        name: str = "",
         creator_note: str = "",
     ) -> "LineshineWorld":
         """Create a new world with randomised parameters."""
@@ -90,10 +92,64 @@ class LineshineWorld:
             radius_km=radius,
             population=pop,
             stability=stability,
+            name=name,
             creator_note=creator_note,
         )
         w.log(f"World {uid} forged by the controller.")
         return w
+
+    # ------------------------------------------------------------------
+    # Serialisation
+    # ------------------------------------------------------------------
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return a JSON-serialisable dictionary representation."""
+        return {
+            "uid": self.uid,
+            "world_type": self.world_type,
+            "radius_km": self.radius_km,
+            "population": self.population,
+            "stability": self.stability,
+            "age_ticks": self.age_ticks,
+            "name": self.name,
+            "creator_note": self.creator_note,
+            "visions": [
+                {
+                    "world_number": v.world_number,
+                    "tick": v.tick,
+                    "power_level": v.power_level,
+                    "insight": v.insight,
+                    "population_observed": v.population_observed,
+                    "stability_observed": v.stability_observed,
+                    "anomaly_detected": v.anomaly_detected,
+                    "anomaly_description": v.anomaly_description,
+                }
+                for v in self.visions
+            ],
+            "event_log": list(self.event_log),
+            "is_active": self.is_active,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "LineshineWorld":
+        """Reconstruct a world from a saved dictionary."""
+        visions = [
+            RasEyeVision(**v) for v in d.get("visions", [])
+        ]
+        world = cls(
+            uid=d["uid"],
+            world_type=d["world_type"],
+            radius_km=d["radius_km"],
+            population=d["population"],
+            stability=d["stability"],
+            age_ticks=d.get("age_ticks", 0),
+            name=d.get("name", ""),
+            creator_note=d.get("creator_note", ""),
+            visions=visions,
+            event_log=d.get("event_log", []),
+            is_active=d.get("is_active", True),
+        )
+        return world
 
     # ------------------------------------------------------------------
     # Helpers
@@ -104,11 +160,13 @@ class LineshineWorld:
 
     def status_line(self) -> str:
         active = "✅" if self.is_active else "💤"
+        name_part = f" | Name={self.name}" if self.name else ""
         return (
             f"{active} World {self.uid:>4} | "
             f"Type={self.world_type:<12} | "
             f"Pop={self.population:>8,} | "
             f"Stability={self.stability:.2f}"
+            f"{name_part}"
         )
 
     def detail(self) -> str:
@@ -120,6 +178,8 @@ class LineshineWorld:
             f"  Stab  : {self.stability:.2f}",
             f"  Active: {'Yes' if self.is_active else 'No'}",
         ]
+        if self.name:
+            lines.insert(1, f"  Name  : {self.name}")
         if self.creator_note:
             lines.append(f"  Note  : {self.creator_note}")
         if self.visions:
