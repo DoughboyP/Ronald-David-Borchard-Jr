@@ -8,9 +8,12 @@ El Capitan simulation engine as the execution backend.
 from __future__ import annotations
 
 import argparse
+import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Iterator, Optional
+from urllib import error, request
 
 from el_capitan import ElCapitan
 
@@ -29,7 +32,7 @@ class EyeInputSource:
 
 class ConsoleEyeInputSource(EyeInputSource):
     def next_event(self) -> Optional[str]:
-        raw = input("Eye event [LEFT/RIGHT/UP/DOWN/CENTER/BLINK/QUIT]: ").strip().upper()
+        raw = input("Eye event [LEFT/RIGHT/UP/DOWN/CENTER/BLINK/QUIT]: ").strip()
         if not raw:
             return None
         return raw
@@ -43,10 +46,94 @@ class ScriptedEyeInputSource(EyeInputSource):
         return next(self._events, "QUIT")
 
 
+class ClaudeEventInterpreter:
+    _KNOWN_EVENTS = {"LEFT", "RIGHT", "UP", "DOWN", "CENTER", "BLINK", "QUIT"}
+
+    def __init__(self, enabled: bool, model: str, api_key_env: str) -> None:
+        self.enabled = enabled
+        self.model = model
+        self.api_key = os.getenv(api_key_env, "")
+
+    def to_event(self, raw_event: str) -> Optional[str]:
+        text = raw_event.strip()
+        if not text:
+            return None
+
+        simple = text.upper()
+        if simple in self._KNOWN_EVENTS:
+            return simple
+
+        if self.enabled and self.api_key:
+            interpreted = self._query_claude(text)
+            if interpreted in self._KNOWN_EVENTS:
+                return interpreted
+
+        return self._fallback_event(text)
+
+    def _query_claude(self, text: str) -> Optional[str]:
+        payload = {
+            "model": self.model,
+            "max_tokens": 20,
+            "temperature": 0,
+            "system": (
+                "Map the user's eye-tracking phrase to one token only: "
+                "LEFT, RIGHT, UP, DOWN, CENTER, BLINK, or QUIT. "
+                "Return only the token."
+            ),
+            "messages": [{"role": "user", "content": text}],
+        }
+        body = json.dumps(payload).encode("utf-8")
+        req = request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=body,
+            method="POST",
+            headers={
+                "content-type": "application/json",
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01",
+            },
+        )
+        try:
+            with request.urlopen(req, timeout=8) as resp:  # noqa: S310
+                data = json.loads(resp.read().decode("utf-8"))
+        except (error.URLError, TimeoutError, OSError, ValueError):
+            return None
+
+        content = data.get("content", [])
+        if not content:
+            return None
+        text_out = str(content[0].get("text", "")).strip().upper()
+        return text_out
+
+    def _fallback_event(self, text: str) -> Optional[str]:
+        t = text.lower()
+        if "left" in t:
+            return "LEFT"
+        if "right" in t:
+            return "RIGHT"
+        if "up" in t or "increase" in t or "more" in t:
+            return "UP"
+        if "down" in t or "decrease" in t or "less" in t:
+            return "DOWN"
+        if "center" in t or "status" in t:
+            return "CENTER"
+        if "blink" in t or "start" in t or "run" in t:
+            return "BLINK"
+        if "quit" in t or "stop" in t or "exit" in t:
+            return "QUIT"
+        return None
+
+
 class LineShineEyeRunner:
-    def __init__(self, config: SimulationConfig, input_source: EyeInputSource) -> None:
+    def __init__(
+        self,
+        config: SimulationConfig,
+        input_source: EyeInputSource,
+        event_interpreter: ClaudeEventInterpreter,
+    ) -> None:
         self.config = config
         self.input_source = input_source
+        self.event_interpreter = event_interpreter
         self._armed_to_run = False
 
     def run(self) -> None:
@@ -55,8 +142,12 @@ class LineShineEyeRunner:
         self._print_status()
 
         while True:
-            event = self.input_source.next_event()
+            raw_event = self.input_source.next_event()
+            if raw_event is None:
+                continue
+            event = self.event_interpreter.to_event(raw_event)
             if event is None:
+                print(f"Unknown event: {raw_event}")
                 continue
 
             if event in {"QUIT", "Q", "EXIT"}:
@@ -144,6 +235,21 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional file with one eye event per line for non-interactive runs.",
     )
+    parser.add_argument(
+        "--use-claude",
+        action="store_true",
+        help="Use Claude API to interpret free-form eye phrases into control commands.",
+    )
+    parser.add_argument(
+        "--claude-model",
+        default="claude-sonnet-4.6",
+        help="Claude model name for event interpretation.",
+    )
+    parser.add_argument(
+        "--anthropic-api-key-env",
+        default="ANTHROPIC_API_KEY",
+        help="Environment variable containing your Anthropic API key.",
+    )
     return parser.parse_args()
 
 
@@ -161,7 +267,16 @@ def main() -> None:
     else:
         input_source = ConsoleEyeInputSource()
 
-    runner = LineShineEyeRunner(config=config, input_source=input_source)
+    event_interpreter = ClaudeEventInterpreter(
+        enabled=args.use_claude,
+        model=args.claude_model,
+        api_key_env=args.anthropic_api_key_env,
+    )
+    runner = LineShineEyeRunner(
+        config=config,
+        input_source=input_source,
+        event_interpreter=event_interpreter,
+    )
     runner.run()
 
 
