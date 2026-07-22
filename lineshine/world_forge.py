@@ -153,6 +153,34 @@ class WorldForge:
         return sum(1 for w in self._worlds.values() if w.is_active)
 
     # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self, path: str) -> None:
+        """Persist all worlds to a JSON file."""
+        data = {
+            "counter": self._counter,
+            "worlds": [w.to_dict() for w in self._worlds.values()],
+        }
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2)
+        print(f"{LOG_PREFIX} 💾 {len(self._worlds)} world(s) saved to '{path}'.")
+
+    def load(self, path: str) -> None:
+        """Load worlds from a JSON file into the forge."""
+        with open(path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        loaded = 0
+        max_uid = self._counter
+        for d in data.get("worlds", []):
+            world = LineshineWorld.from_dict(d)
+            self._worlds[world.uid] = world
+            max_uid = max(max_uid, world.uid)
+            loaded += 1
+        self._counter = max(self._counter, data.get("counter", max_uid))
+        print(f"{LOG_PREFIX} 📂 {loaded} world(s) loaded from '{path}'.")
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 

@@ -9,6 +9,7 @@ authority to forge, inspect, and govern unlimited worlds within its system.
 
 from __future__ import annotations
 
+import os
 import random
 import sys
 from typing import List, Optional
@@ -44,7 +45,7 @@ _BANNER = r"""
 
 _HELP = """
   ── Commands ──────────────────────────────────────────────────
-  create  [type]          Forge a new world (type optional)
+  create  [type] [name]   Forge a new world (type and name optional)
   list                    List all worlds
   info    <num>           Show detailed info for a world
   scan    <num>           Have Ra's Eye observe a specific world
@@ -53,11 +54,14 @@ _HELP = """
   deactivate <num>        Put a world into dormant state
   reactivate <num>        Restore a dormant world
   destroy <num>           Permanently destroy a world
+  save    [file]          Save all worlds to a file
   eye                     Show Ra's Eye status
   types                   List available world types
   help                    Show this help message
   quit                    Shut down Lineshine
   ──────────────────────────────────────────────────────────────
+  Tip: 'create Volcanic FireReach' forges a named Volcanic world.
+       'create MyWorld' forges a world of random type named MyWorld.
 """
 
 
@@ -76,14 +80,18 @@ class LineshineComputer:
     ----------
     seed:
         Master random seed for reproducibility.
+    save_file:
+        Path to the JSON file used for auto-save on shutdown and
+        auto-load on boot.  If ``None`` no automatic persistence occurs.
     """
 
-    def __init__(self, seed: int = 2025) -> None:
+    def __init__(self, seed: int = 2025, save_file: Optional[str] = None) -> None:
         self._seed = seed
         self._rng = random.Random(seed)
         self._forge: Optional[WorldForge] = None
         self._eye: Optional[RasEye] = None
         self._booted = False
+        self._save_file = save_file
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -103,11 +111,17 @@ class LineshineComputer:
         self._eye = RasEye(rng=self._rng)
         self._eye.awaken()
 
+        if self._save_file and os.path.isfile(self._save_file):
+            try:
+                self._forge.load(self._save_file)
+            except Exception as exc:
+                print(f"{LOG_PREFIX} ⚠ Could not load save file: {exc}")
+
         self._booted = True
         print(f"{LOG_PREFIX} ✅ {COMPUTER_NAME} online. Unlimited world creation ready.\n")
 
     def shutdown(self) -> None:
-        """Print the final report and power down."""
+        """Print the final report, auto-save if configured, and power down."""
         self._require_boot()
         worlds = self._forge.all_worlds()
 
@@ -116,12 +130,13 @@ class LineshineComputer:
         print(f"{'═' * LINE_WIDTH}")
 
         if worlds:
-            print(f"\n  {'Num':>4}  {'Type':<12}  {'Pop':>9}  {'Stab'}")
-            print(f"  {'─'*4}  {'─'*12}  {'─'*9}  {'─'*4}")
+            print(f"\n  {'Num':>4}  {'Type':<12}  {'Name':<16}  {'Pop':>9}  {'Stab'}")
+            print(f"  {'─'*4}  {'─'*12}  {'─'*16}  {'─'*9}  {'─'*4}")
             for w in worlds:
                 active = "✅" if w.is_active else "💤"
                 print(
                     f"  {w.uid:>4}  {w.world_type:<12}  "
+                    f"{(w.name or '—'):<16}  "
                     f"{w.population:>9,}  {w.stability:.2f}  {active}"
                 )
         else:
@@ -131,6 +146,13 @@ class LineshineComputer:
         print(f"  Active worlds       : {self._forge.active_count}")
         print()
         print(self._eye.status())
+
+        if self._save_file:
+            try:
+                self._forge.save(self._save_file)
+            except Exception as exc:
+                print(f"{LOG_PREFIX} ⚠ Could not save worlds: {exc}")
+
         print(f"\n{LOG_PREFIX} 🛑 {COMPUTER_NAME} powered down. Ra's Eye dimmed.\n")
 
     # ------------------------------------------------------------------
@@ -140,11 +162,12 @@ class LineshineComputer:
     def forge(
         self,
         world_type: Optional[str] = None,
+        name: str = "",
         creator_note: str = "",
     ) -> LineshineWorld:
         """Forge a new world and immediately observe it with Ra's Eye."""
         self._require_boot()
-        world = self._forge.forge(world_type=world_type, creator_note=creator_note)
+        world = self._forge.forge(world_type=world_type, name=name, creator_note=creator_note)
         vision = self._eye.observe(world)
         print(vision.display())
         print()
@@ -170,6 +193,15 @@ class LineshineComputer:
         for v in visions:
             print(v.display())
             print()
+
+    def save(self, path: Optional[str] = None) -> None:
+        """Save all worlds to a file (defaults to the configured save_file)."""
+        self._require_boot()
+        target = path or self._save_file
+        if not target:
+            target = "lineshine_worlds.json"
+        self._save_file = target
+        self._forge.save(target)
 
     @property
     def worlds(self) -> List[LineshineWorld]:
@@ -225,8 +257,8 @@ class LineshineComputer:
             print()
 
         elif cmd == "create":
-            wtype = args[0] if args else None
-            self.forge(world_type=wtype)
+            wtype, name = self._parse_create_args(args)
+            self.forge(world_type=wtype, name=name)
 
         elif cmd == "list":
             worlds = self._forge.all_worlds()
@@ -280,6 +312,10 @@ class LineshineComputer:
             else:
                 print("  Destruction cancelled.\n")
 
+        elif cmd == "save":
+            path = args[0] if args else None
+            self.save(path)
+
         elif cmd == "eye":
             print()
             print(self._eye.status())
@@ -287,6 +323,27 @@ class LineshineComputer:
 
         else:
             print(f"  Unknown command '{cmd}'. Type 'help' for a list of commands.\n")
+
+    @staticmethod
+    def _parse_create_args(args: List[str]):
+        """
+        Parse optional ``[type] [name...]`` arguments for the ``create`` command.
+
+        Rules:
+        - If the first token is a valid world type, it is used as the type
+          and any remaining tokens form the world name.
+        - Otherwise all tokens form the world name and the type is chosen
+          at random.
+        """
+        if not args:
+            return None, ""
+        if args[0].capitalize() in WORLD_TYPES:
+            wtype = args[0].capitalize()
+            name = " ".join(args[1:])
+        else:
+            wtype = None
+            name = " ".join(args)
+        return wtype, name
 
     @staticmethod
     def _parse_uid(args: List[str]) -> int:
